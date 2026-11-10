@@ -23,7 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
+import com.example.bloopyblocks.Draw
+import com.example.bloopyblocks.Gallery
 import com.example.bloopyblocks.R
+import com.example.bloopyblocks.World
 import com.example.bloopyblocks.data.DefaultDataRepository
 import com.example.bloopyblocks.ui.theme.BloopyBlocksTheme
 
@@ -44,7 +47,7 @@ fun MainScreen(
       }
     }
     is MainScreenUiState.Success -> {
-      MainScreen(data = state.data, modifier = modifier)
+      MainScreen(data = state.data, modifier = modifier ,onItemClick = onItemClick)
     }
     is MainScreenUiState.Error -> {
       Text("Error loading data: ${state.throwable.message}")
@@ -54,7 +57,7 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier) {
+internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier ,onItemClick: (NavKey) -> Unit = {}) {
   Scaffold(
     modifier = modifier,
     topBar = {
@@ -77,10 +80,23 @@ internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier) {
       data.forEach { Greeting(it) }
       Button(
         modifier = Modifier.padding(24.dp, 24.dp),
-        onClick = { /* Button clicked */ }
+        onClick = { onItemClick(Draw) }
       ) {
-        Text("OK")
+        Text("Draw")
       }
+      Button(
+        modifier = Modifier.padding(24.dp, 24.dp),
+        onClick = { onItemClick(Gallery) }
+      ) {
+        Text("My Blocks")
+      }
+      Button(
+        modifier = Modifier.padding(24.dp, 24.dp),
+        onClick = { onItemClick(World) }
+      ) {
+        Text("World")
+      }
+
 
       // TODO: Extend app UI with more Jetpack Compose UI elements here
 
