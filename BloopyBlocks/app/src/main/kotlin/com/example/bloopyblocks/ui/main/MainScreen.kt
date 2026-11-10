@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,8 +19,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
@@ -28,6 +31,9 @@ import com.example.bloopyblocks.Gallery
 import com.example.bloopyblocks.R
 import com.example.bloopyblocks.World
 import com.example.bloopyblocks.data.DefaultDataRepository
+import com.example.bloopyblocks.ui.theme.BloopCream
+import com.example.bloopyblocks.ui.theme.BloopDark
+import com.example.bloopyblocks.ui.theme.BloopTeal
 import com.example.bloopyblocks.ui.theme.BloopyBlocksTheme
 
 @Composable
@@ -60,12 +66,13 @@ fun MainScreen(
 internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier ,onItemClick: (NavKey) -> Unit = {}) {
   Scaffold(
     modifier = modifier,
+    containerColor = BloopCream,
     topBar = {
       CenterAlignedTopAppBar(
         title = { Text(stringResource(R.string.app_name)) },
         colors = TopAppBarDefaults.topAppBarColors(
-          containerColor = MaterialTheme.colorScheme.primaryContainer,
-          titleContentColor = MaterialTheme.colorScheme.primary
+          containerColor = BloopCream,
+          titleContentColor = BloopDark
         )
       )
     }
@@ -77,21 +84,31 @@ internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier ,onIte
       modifier = Modifier.padding(innerPadding),
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-      data.forEach { Greeting(it) }
+      Text(
+        text = "My World",
+        fontSize = 28.sp,
+        fontWeight = FontWeight.Bold,
+        color = BloopDark,
+        modifier = Modifier.padding(24.dp, 16.dp)
+      )
+
       Button(
         modifier = Modifier.padding(24.dp, 24.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = BloopTeal),
         onClick = { onItemClick(Draw) }
       ) {
         Text("Draw")
       }
       Button(
         modifier = Modifier.padding(24.dp, 24.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = BloopTeal),
         onClick = { onItemClick(Gallery) }
       ) {
         Text("My Blocks")
       }
       Button(
         modifier = Modifier.padding(24.dp, 24.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = BloopTeal),
         onClick = { onItemClick(World) }
       ) {
         Text("World")
