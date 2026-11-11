@@ -32,6 +32,16 @@ val primaryDark = Color(0xFF87CFF9)
 val primaryContainerDark = Color(0xFF005C7D)
 val secondaryDark = Color(0xFFB0CADC)
 val tertiaryDark = Color(0xFFE6B5F8)
+//Bloopy Blocks Colors
+val BloopTeal = Color(0xFF42C5B5)
+val BloopYellow = Color(0xFFFFD166)
+val BloopCoral = Color(0xFFFF7A66)
+val BloopCream = Color(0xFFFFF9EE)
+val BloopDark = Color(0xFF24324A)
+val BloopGray = Color(0xFF5B6678)
+val BloopSky = Color(0xFF9EC9FF)
+val BloopGrass = Color(0xFF7CCB6B)
+
 
 //End - Partial Color List
 
