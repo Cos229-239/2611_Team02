@@ -18,8 +18,11 @@ class MainScreenTest {
   }
 
   @Test
-  fun firstItem_exists() {
-    FAKE_DATA.forEach { composeTestRule.onNodeWithText("Hello $it!").assertExists() }
+  fun homeScreen_showsTitleAndButtons() {
+    composeTestRule.onNodeWithText("My World").assertExists()
+    composeTestRule.onNodeWithText("Keep Building").assertExists()
+    composeTestRule.onNodeWithText("Draw a Block").assertExists()
+    composeTestRule.onNodeWithText("My Blocks").assertExists()
   }
 }
 
