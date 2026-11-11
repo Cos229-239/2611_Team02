@@ -12,7 +12,7 @@ class StrokePainterTest
     private val inner = 377f
 
     // the color the finger paints with
-    private val teal = 0xFF4ECDC4.toInt()
+    private val teal = 0xFF42C5B5.toInt()
 
     // an empty grid and the painter under test
     private val pixels = MutableList(GRID_SQUARE_COUNT) { 0 }

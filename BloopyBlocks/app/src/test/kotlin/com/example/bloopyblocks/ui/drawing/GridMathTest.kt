@@ -12,8 +12,8 @@ class GridMathTest
     private val inner = 377f
 
     // the two test colors
-    private val teal = 0xFF4ECDC4.toInt()
-    private val navy = 0xFF1E2A44.toInt()
+    private val teal = 0xFF42C5B5.toInt()
+    private val navy = 0xFF24324A.toInt()
 
     // builds a full grid from short rows, T is teal, N is navy, anything else is empty
     private fun grid(rows: List<String>): List<Int>
@@ -90,7 +90,7 @@ class GridMathTest
     @Test
     fun sideBySideJoinAcrossTheGap()
     {
-        val left = meltShape(grid(listOf("TT")), 0)
+        val left = getMeltShape(grid(listOf("TT")), 0)
         assertTrue(left.joinRight)
         assertFalse(left.roundTopRight)
         assertFalse(left.roundBottomRight)
@@ -102,7 +102,7 @@ class GridMathTest
     @Test
     fun stackedJoinDown()
     {
-        val top = meltShape(grid(listOf("T", "T")), 0)
+        val top = getMeltShape(grid(listOf("T", "T")), 0)
         assertTrue(top.joinDown)
         assertFalse(top.roundBottomLeft)
         assertFalse(top.roundBottomRight)
@@ -112,17 +112,17 @@ class GridMathTest
     @Test
     fun differentColorsKeepTheirGap()
     {
-        val shape = meltShape(grid(listOf("TN")), 0)
+        val shape = getMeltShape(grid(listOf("TN")), 0)
         assertFalse(shape.joinRight)
         assertTrue(shape.roundTopRight)
     }
 
-    // the little crossing fills when 3 or 4 squares around it share a color
+    // the little crossing only fills when all 4 squares around it share a color
     @Test
-    fun crossingFillsAtThreeOrFour()
+    fun crossingFillsAtFour()
     {
-        assertEquals(teal, crossingColor(grid(listOf("TT", "TT")), 0, 0))
-        assertEquals(teal, crossingColor(grid(listOf("TT", "T.")), 0, 0))
-        assertEquals(0, crossingColor(grid(listOf("T.", ".T")), 0, 0))
+        assertEquals(teal, getCrossingColor(grid(listOf("TT", "TT")), 0, 0))
+        assertEquals(0, getCrossingColor(grid(listOf("TT", "T.")), 0, 0))
+        assertEquals(0, getCrossingColor(grid(listOf("T.", ".T")), 0, 0))
     }
 }

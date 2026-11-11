@@ -102,7 +102,7 @@ class StrokePainter
             return
         }
         // a square painted this stroke beats what pixels says
-        var current = pixelAt(pixels, index)
+        var current = getPixelAt(pixels, index)
         if (strokePainted[index])
         {
             current = strokeColors[index]

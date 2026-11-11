@@ -24,7 +24,7 @@ const val GRID_LABEL = "Drawing grid, 8 by 8"
 private const val SAMPLES_PER_SQUARE = 3
 
 // a crossing fills when this many of its 4 squares share a color
-private const val CROSSING_MIN_SAME = 3
+private const val CROSSING_MIN_SAME = 4
 
 // card and square sizes from the design
 val GridGap = GRID_GAP_DP.dp
@@ -113,7 +113,7 @@ fun getGridSquareSize(cardWidth: Float): Float
 }
 
 // returns the color at index, or 0 past the end of the list
-fun pixelAt(pixels: List<Int>, index: Int): Int
+fun getPixelAt(pixels: List<Int>, index: Int): Int
 {
     if (index < 0 || index >= pixels.size)
     {
@@ -123,13 +123,13 @@ fun pixelAt(pixels: List<Int>, index: Int): Int
 }
 
 // returns the color at a row and col, or 0 off the grid
-private fun colorAt(pixels: List<Int>, row: Int, col: Int): Int
+private fun getColorAt(pixels: List<Int>, row: Int, col: Int): Int
 {
     if (row < 0 || col < 0 || row >= GRID_SIZE || col >= GRID_SIZE)
     {
         return 0
     }
-    return pixelAt(pixels, row * GRID_SIZE + col)
+    return getPixelAt(pixels, row * GRID_SIZE + col)
 }
 
 // true when the square at row, col holds this color, empty never counts
@@ -139,15 +139,15 @@ private fun isSameColor(pixels: List<Int>, row: Int, col: Int, color: Int): Bool
     {
         return false
     }
-    return colorAt(pixels, row, col) == color
+    return getColorAt(pixels, row, col) == color
 }
 
 // returns the joins and corners for the square at index
-fun meltShape(pixels: List<Int>, index: Int): MeltShape
+fun getMeltShape(pixels: List<Int>, index: Int): MeltShape
 {
     val row = index / GRID_SIZE
     val col = index % GRID_SIZE
-    val color = pixelAt(pixels, index)
+    val color = getPixelAt(pixels, index)
     // which of the four sides touch the same color
     val up = isSameColor(pixels, row - 1, col, color)
     val down = isSameColor(pixels, row + 1, col, color)
@@ -179,14 +179,14 @@ private fun countSame(colors: List<Int>, color: Int): Int
 }
 
 // returns the color for the crossing below and right of square row, col, or 0
-fun crossingColor(pixels: List<Int>, row: Int, col: Int): Int
+fun getCrossingColor(pixels: List<Int>, row: Int, col: Int): Int
 {
     // the four squares around the crossing
     val around = listOf(
-        colorAt(pixels, row, col),
-        colorAt(pixels, row, col + 1),
-        colorAt(pixels, row + 1, col),
-        colorAt(pixels, row + 1, col + 1)
+        getColorAt(pixels, row, col),
+        getColorAt(pixels, row, col + 1),
+        getColorAt(pixels, row + 1, col),
+        getColorAt(pixels, row + 1, col + 1)
     )
     for (i in 0 until around.size)
     {
