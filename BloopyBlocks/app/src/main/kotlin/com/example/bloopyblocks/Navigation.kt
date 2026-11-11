@@ -2,6 +2,7 @@ package com.example.bloopyblocks
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -21,6 +22,15 @@ fun MainNavigation() {
       entryProvider {
         entry<Main> {
           MainScreen(onItemClick = { navKey -> backStack.add(navKey) })
+        }
+        entry< Draw>{
+          Text("Draw screen...")
+        }
+        entry<Gallery> {
+          Text("Gallery screen...")
+        }
+        entry<World> {
+          Text("World screen...")
         }
       },
   )
