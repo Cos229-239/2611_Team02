@@ -1,15 +1,25 @@
 package com.example.bloopyblocks.ui.main
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -17,89 +27,185 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
+import com.example.bloopyblocks.Draw
+import com.example.bloopyblocks.Gallery
 import com.example.bloopyblocks.R
+import com.example.bloopyblocks.World
 import com.example.bloopyblocks.data.DefaultDataRepository
+import com.example.bloopyblocks.ui.theme.BloopCream
+import com.example.bloopyblocks.ui.theme.BloopDark
+import com.example.bloopyblocks.ui.theme.BloopGrass
+import com.example.bloopyblocks.ui.theme.BloopGray
+import com.example.bloopyblocks.ui.theme.BloopSky
+import com.example.bloopyblocks.ui.theme.BloopTeal
 import com.example.bloopyblocks.ui.theme.BloopyBlocksTheme
 
 @Composable
 fun MainScreen(
-  onItemClick: (NavKey) -> Unit,
-  modifier: Modifier = Modifier,
-  viewModel: MainScreenViewModel = viewModel { MainScreenViewModel(DefaultDataRepository()) },
+    onItemClick: (NavKey) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: MainScreenViewModel = viewModel { MainScreenViewModel(DefaultDataRepository()) },
 ) {
-  val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-  when (val state = uiState) {
-    MainScreenUiState.Loading -> {
-      Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-      ) {
-        CircularProgressIndicator()
-      }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    when (val state = uiState) {
+        MainScreenUiState.Loading -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        is MainScreenUiState.Success -> {
+            MainScreen(data = state.data, modifier = modifier, onItemClick = onItemClick)
+        }
+
+        is MainScreenUiState.Error -> {
+            Text("Error loading data: ${state.throwable.message}")
+        }
     }
-    is MainScreenUiState.Success -> {
-      MainScreen(data = state.data, modifier = modifier)
-    }
-    is MainScreenUiState.Error -> {
-      Text("Error loading data: ${state.throwable.message}")
-    }
-  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier) {
-  Scaffold(
-    modifier = modifier,
-    topBar = {
-      CenterAlignedTopAppBar(
-        title = { Text(stringResource(R.string.app_name)) },
-        colors = TopAppBarDefaults.topAppBarColors(
-          containerColor = MaterialTheme.colorScheme.primaryContainer,
-          titleContentColor = MaterialTheme.colorScheme.primary
-        )
-      )
+internal fun MainScreen(
+    data: List<String>,
+    modifier: Modifier = Modifier,
+    onItemClick: (NavKey) -> Unit = {}
+) {
+    Scaffold(
+        modifier = modifier,
+        containerColor = BloopCream,
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(stringResource(R.string.app_name)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = BloopCream,
+                    titleContentColor = BloopDark
+                )
+            )
+        }
+    ) { innerPadding ->
+
+        // App Content
+
+        Column(
+            modifier = Modifier.padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "My World",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = BloopDark,
+                modifier = Modifier.padding(24.dp, 16.dp)
+            )
+            Text(
+                text = "Welcome back, builder!",
+                fontSize = 14.sp,
+                color = BloopGray,
+                modifier = Modifier.padding(horizontal = 24.dp)
+            )
+            Box(
+                modifier = Modifier
+                  .padding(horizontal = 24.dp)
+                  .fillMaxWidth()
+                  .height(180.dp)
+                  .clip(RoundedCornerShape(20.dp))
+                  .background(BloopSky),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+
+                Box(
+                    modifier = Modifier
+                      .fillMaxWidth()
+                      .height(40.dp)
+                      .background(BloopGrass)
+                )
+            }
+            Row(
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                      .size(44.dp)
+                      .clip(CircleShape)
+                      .background(BloopTeal)
+                )
+                Text(
+                    text = "Your world missed you!\nReady to build more?",
+                    fontSize = 13.sp,
+                    color = BloopDark,
+                    modifier = Modifier
+                      .padding(start = 12.dp)
+                      .clip(RoundedCornerShape(12.dp))
+                      .background(Color.White)
+                      .padding(horizontal = 12.dp, vertical = 8.dp)
+                )
+            }
+            Button(
+                modifier = Modifier
+                  .padding(horizontal = 24.dp)
+                  .fillMaxWidth()
+                  .height(52.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = BloopTeal),
+                onClick = { onItemClick(World) }
+            ) {
+                Text("Keep Building")
+            }
+            OutlinedButton(
+                border = BorderStroke(2.dp, BloopTeal),
+                modifier = Modifier
+                  .padding(horizontal = 24.dp)
+                  .fillMaxWidth()
+                  .height(52.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = BloopDark),
+                onClick = { onItemClick(Draw) }
+            ) {
+                Text("Draw a Block")
+            }
+            Button(
+                modifier = Modifier
+                  .padding(horizontal = 24.dp)
+                  .fillMaxWidth()
+                  .height(52.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = BloopTeal),
+                onClick = { onItemClick(Gallery) }
+            ) {
+                Text("My Blocks")
+            }
+
+
+            // TODO: Extend app UI with more Jetpack Compose UI elements here
+
+        }
     }
-  ) { innerPadding ->
-
-    // App Content
-
-    Column(
-      modifier = Modifier.padding(innerPadding),
-      verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-      data.forEach { Greeting(it) }
-      Button(
-        modifier = Modifier.padding(24.dp, 24.dp),
-        onClick = { /* Button clicked */ }
-      ) {
-        Text("OK")
-      }
-
-      // TODO: Extend app UI with more Jetpack Compose UI elements here
-
-    }
-  }
 }
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-  Text(
-    text = "Hello $name !",
-    modifier = modifier.padding(16.dp, 16.dp),
-    style = MaterialTheme.typography.bodyLarge
-  )
+    Text(
+        text = "Hello $name !",
+        modifier = modifier.padding(16.dp, 16.dp),
+        style = MaterialTheme.typography.bodyLarge
+    )
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
-  BloopyBlocksTheme { MainScreen(listOf("Android")) }
+    BloopyBlocksTheme { MainScreen(listOf("Android")) }
 }
 
