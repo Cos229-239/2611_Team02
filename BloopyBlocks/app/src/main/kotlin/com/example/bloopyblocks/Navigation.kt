@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.bloopyblocks.ui.gallery.GalleryScreen
 import com.example.bloopyblocks.ui.main.MainScreen
 
 @Composable
@@ -24,10 +25,16 @@ fun MainNavigation() {
           MainScreen(onItemClick = { navKey -> backStack.add(navKey) })
         }
         entry< Draw>{
-          Text("Draw screen...")
+                  Text("Draw screen...")
         }
         entry<Gallery> {
-          Text("Gallery screen...")
+          GalleryScreen(
+          blocks = emptyList(),
+          onNewBlock = { backStack.add(Draw) },
+          onBlockSelected = {},
+          onBuild = { backStack.add(World) },
+          onDraw = { backStack.add(Draw) },
+           )
         }
         entry<World> {
           Text("World screen...")
