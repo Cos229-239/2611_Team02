@@ -41,7 +41,9 @@ val BloopDark = Color(0xFF24324A)
 val BloopGray = Color(0xFF5B6678)
 val BloopSky = Color(0xFF9EC9FF)
 val BloopGrass = Color(0xFF7CCB6B)
-
+val BloopLinen = Color(0xFFE7E0D4)
+val BloopCreamDeep = Color(0xFFFFF3D6)
+val BloopIconGray = Color(0xFFD9DEE7)
 
 //End - Partial Color List
 

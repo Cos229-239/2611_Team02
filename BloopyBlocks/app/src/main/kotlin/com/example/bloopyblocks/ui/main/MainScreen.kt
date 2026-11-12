@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -46,12 +47,14 @@ import com.example.bloopyblocks.Gallery
 import com.example.bloopyblocks.R
 import com.example.bloopyblocks.World
 import com.example.bloopyblocks.data.DefaultDataRepository
+import com.example.bloopyblocks.ui.theme.BloopBodyFont
 import com.example.bloopyblocks.ui.theme.BloopCream
 import com.example.bloopyblocks.ui.theme.BloopDark
 import com.example.bloopyblocks.ui.theme.BloopGrass
 import com.example.bloopyblocks.ui.theme.BloopGray
 import com.example.bloopyblocks.ui.theme.BloopSky
 import com.example.bloopyblocks.ui.theme.BloopTeal
+import com.example.bloopyblocks.ui.theme.BloopTitleFont
 import com.example.bloopyblocks.ui.theme.BloopyBlocksTheme
 
 @Composable
@@ -93,7 +96,7 @@ internal fun MainScreen(
         containerColor = BloopCream,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
+                title = { Text(stringResource(R.string.app_name), fontFamily = BloopTitleFont) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = BloopCream,
                     titleContentColor = BloopDark
@@ -111,13 +114,15 @@ internal fun MainScreen(
             Text(
                 text = "My World",
                 fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
+                fontFamily = BloopTitleFont,
+                fontWeight = FontWeight.SemiBold,
                 color = BloopDark,
                 modifier = Modifier.padding(24.dp, 16.dp)
             )
             Text(
                 text = "Welcome back, builder!",
                 fontSize = 14.sp,
+                fontFamily = BloopBodyFont,
                 color = BloopGray,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
@@ -150,6 +155,7 @@ internal fun MainScreen(
                 Text(
                     text = "Your world missed you!\nReady to build more?",
                     fontSize = 13.sp,
+                    fontFamily = BloopBodyFont,
                     color = BloopDark,
                     modifier = Modifier
                       .padding(start = 12.dp)
@@ -166,18 +172,33 @@ internal fun MainScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = BloopTeal),
                 onClick = { onItemClick(World) }
             ) {
-                Text("Keep Building")
+                Text("Keep Building", fontFamily = BloopTitleFont)
             }
-            OutlinedButton(
-                border = BorderStroke(2.dp, BloopTeal),
+            Box(
                 modifier = Modifier
-                  .padding(horizontal = 24.dp)
-                  .fillMaxWidth()
-                  .height(52.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = BloopDark),
-                onClick = { onItemClick(Draw) }
-            ) {
-                Text("Draw a Block")
+                    .padding(horizontal = 24.dp)
+                    .fillMaxWidth()
+                    .height(55.dp)
+            ){
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                        .offset(y = 3.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(BloopTeal)
+                )
+                Button(
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    colors= ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = BloopDark
+                    ),
+                    onClick={onItemClick(Draw)}
+                ){
+                    Text("Draw a Block", fontFamily = BloopTitleFont)
+                }
+
             }
             Button(
                 modifier = Modifier
@@ -187,7 +208,7 @@ internal fun MainScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = BloopTeal),
                 onClick = { onItemClick(Gallery) }
             ) {
-                Text("My Blocks")
+                Text("My Blocks", fontFamily = BloopTitleFont)
             }
 
 
