@@ -141,7 +141,7 @@ private fun paintSquares(squares: List<Int>, painter: StrokePainter, time: Long,
     }
     if (squares.size > 0 && painter.canTick(time))
     {
-        haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+        haptic.performHapticFeedback(HapticFeedbackType.KeyboardTap)
     }
 }
 
