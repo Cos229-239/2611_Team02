@@ -32,6 +32,11 @@ import com.example.bloopyblocks.data.local.BlockDatabase
 import com.example.bloopyblocks.data.local.BlockEntity
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import com.example.bloopyblocks.data.remote.FireBaseAuthManager
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 
 @Composable
 fun MainScreen(
@@ -39,6 +44,12 @@ fun MainScreen(
   modifier: Modifier = Modifier,
 ) {
   val context = LocalContext.current.applicationContext
+  var userId by remember {
+    mutableStateOf<String?>(null)
+  }
+  var authError by remember {
+    mutableStateOf<String?>(null)
+  }
   val viewModel: MainScreenViewModel = viewModel {
     val database = BlockDatabase.getDatabase(context)
     val repository = RoomBlockRepository(database.blockDao())
