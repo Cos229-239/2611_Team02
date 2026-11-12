@@ -30,6 +30,8 @@ import com.example.bloopyblocks.ui.theme.BloopyBlocksTheme
 import com.example.bloopyblocks.data.RoomBlockRepository
 import com.example.bloopyblocks.data.local.BlockDatabase
 import com.example.bloopyblocks.data.local.BlockEntity
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun MainScreen(
@@ -54,7 +56,7 @@ fun MainScreen(
       }
     }
     is MainScreenUiState.Success -> {
-      MainScreen(data = state.data,onInsertClick={viewModel.insertTestBlock()}, modifier = modifier)
+      MainScreen(data = state.data,onInsertClick={viewModel.insertTestBlock()}, onUpdateClick = {viewModel.updateTestBlock()}, onDeleteClick = {viewModel.deleteTestBlock()}, modifier = modifier)
     }
     is MainScreenUiState.Error -> {
       Text("Error loading data: ${state.throwable.message}")
@@ -64,7 +66,7 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MainScreen(data: List<BlockEntity>, onInsertClick: ()->Unit, modifier: Modifier = Modifier) {
+internal fun MainScreen(data: List<BlockEntity>, onInsertClick: ()->Unit, onUpdateClick: ()->Unit, onDeleteClick: ()->Unit, modifier: Modifier = Modifier) {
   Scaffold(
     modifier = modifier,
     topBar = {
@@ -81,17 +83,26 @@ internal fun MainScreen(data: List<BlockEntity>, onInsertClick: ()->Unit, modifi
     // App Content
 
     Column(
-      modifier = Modifier.padding(innerPadding),
+      modifier = Modifier
+        .padding(innerPadding)
+        .verticalScroll(rememberScrollState()),
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-      data.forEach { Greeting(it.name) }
+      data.forEach { PrintBlock(it) }
       Button(
         modifier = Modifier.padding(24.dp, 24.dp),
         onClick = onInsertClick
       ) {
-        Text("OK")
+        Text("add block")
       }
-
+      Button(
+        modifier = Modifier.padding(24.dp, 24.dp),
+        onClick = onUpdateClick
+      ) {Text("update block")}
+      Button(
+        modifier = Modifier.padding(24.dp, 24.dp),
+        onClick = onDeleteClick
+      ){Text("delete block")}
       // TODO: Extend app UI with more Jetpack Compose UI elements here
 
     }
@@ -106,10 +117,20 @@ fun Greeting(s: String, modifier: Modifier = Modifier) {
     style = MaterialTheme.typography.bodyLarge
   )
 }
+@Composable
+fun PrintBlock(block: BlockEntity, modifier: Modifier = Modifier) {
+  val name = block.name
+  val id = block.id
+  Text(
+    text = "block id: $id - block name: $name",
+    modifier = modifier.padding(16.dp, 16.dp),
+    style = MaterialTheme.typography.bodyLarge
+  )
+}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
-  BloopyBlocksTheme { MainScreen(listOf(BlockEntity(id = "1", name="testblock", pixels=listOf(1,0,1,0))), onInsertClick = {}) }
+  BloopyBlocksTheme { MainScreen(listOf(BlockEntity(id = "1", name="testblock", pixels=listOf(1,0,1,0))), onInsertClick = {}, onUpdateClick = {}, onDeleteClick = {}) }
 }
 

@@ -13,6 +13,7 @@ import com.example.bloopyblocks.data.BlockRepository
 import com.example.bloopyblocks.data.local.BlockEntity
 import kotlinx.coroutines.launch
 import java.util.UUID
+import kotlinx.coroutines.flow.first
 
 class MainScreenViewModel(private val blockRepository: BlockRepository) : ViewModel() {
   val uiState: StateFlow<MainScreenUiState> =
@@ -25,6 +26,25 @@ class MainScreenViewModel(private val blockRepository: BlockRepository) : ViewMo
       val block = BlockEntity(id=UUID.randomUUID().toString(),name="bloop",pixels=listOf(1,0,1,0))
       blockRepository.insertBlock(block)
 
+    }
+  }
+  fun updateTestBlock(){
+    viewModelScope.launch{
+      val blocks = blockRepository.allBlocks.first()
+      if(blocks.isNotEmpty()){
+        val block = blocks.first().copy(name="update block")
+        blockRepository.updateBlock(block)
+
+      }
+    }
+  }
+  fun deleteTestBlock(){
+    viewModelScope.launch {
+      val blocks = blockRepository.allBlocks.first()
+      if(blocks.isNotEmpty()){
+        val block = blocks.first()
+        blockRepository.deleteBlock(block)
+      }
     }
   }
 }
