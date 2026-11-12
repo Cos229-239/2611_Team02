@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,13 +27,22 @@ import androidx.navigation3.runtime.NavKey
 import com.example.bloopyblocks.R
 import com.example.bloopyblocks.data.DefaultDataRepository
 import com.example.bloopyblocks.ui.theme.BloopyBlocksTheme
+import com.example.bloopyblocks.data.RoomBlockRepository
+import com.example.bloopyblocks.data.local.BlockDatabase
+import com.example.bloopyblocks.data.local.BlockEntity
 
 @Composable
 fun MainScreen(
   onItemClick: (NavKey) -> Unit,
   modifier: Modifier = Modifier,
-  viewModel: MainScreenViewModel = viewModel { MainScreenViewModel(DefaultDataRepository()) },
 ) {
+  val context = LocalContext.current.applicationContext
+  val viewModel: MainScreenViewModel = viewModel {
+    val database = BlockDatabase.getDatabase(context)
+    val repository = RoomBlockRepository(database.blockDao())
+    MainScreenViewModel(repository)
+
+  }
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
   when (val state = uiState) {
     MainScreenUiState.Loading -> {
@@ -44,7 +54,7 @@ fun MainScreen(
       }
     }
     is MainScreenUiState.Success -> {
-      MainScreen(data = state.data, modifier = modifier)
+      MainScreen(data = state.data,onInsertClick={viewModel.insertTestBlock()}, modifier = modifier)
     }
     is MainScreenUiState.Error -> {
       Text("Error loading data: ${state.throwable.message}")
@@ -54,7 +64,7 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier) {
+internal fun MainScreen(data: List<BlockEntity>, onInsertClick: ()->Unit, modifier: Modifier = Modifier) {
   Scaffold(
     modifier = modifier,
     topBar = {
@@ -74,10 +84,10 @@ internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier) {
       modifier = Modifier.padding(innerPadding),
       verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-      data.forEach { Greeting(it) }
+      data.forEach { Greeting(it.name) }
       Button(
         modifier = Modifier.padding(24.dp, 24.dp),
-        onClick = { /* Button clicked */ }
+        onClick = onInsertClick
       ) {
         Text("OK")
       }
@@ -89,9 +99,9 @@ internal fun MainScreen(data: List<String>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun Greeting(s: String, modifier: Modifier = Modifier) {
   Text(
-    text = "Hello $name !",
+    text = "Hello $s !",
     modifier = modifier.padding(16.dp, 16.dp),
     style = MaterialTheme.typography.bodyLarge
   )
@@ -100,6 +110,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
-  BloopyBlocksTheme { MainScreen(listOf("Android")) }
+  BloopyBlocksTheme { MainScreen(listOf(BlockEntity(id = "1", name="testblock", pixels=listOf(1,0,1,0))), onInsertClick = {}) }
 }
 

@@ -6,5 +6,7 @@ import androidx.room.PrimaryKey
 data class BlockEntity (
     @PrimaryKey
     val id: String,
-    val name: String
+    val name: String,
+    val pixels: List<Int>
 )
+

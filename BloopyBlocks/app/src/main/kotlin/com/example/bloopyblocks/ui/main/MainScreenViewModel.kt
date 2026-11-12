@@ -9,13 +9,24 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import com.example.bloopyblocks.data.BlockRepository
+import com.example.bloopyblocks.data.local.BlockEntity
+import kotlinx.coroutines.launch
+import java.util.UUID
 
-class MainScreenViewModel(dataRepository: DataRepository) : ViewModel() {
+class MainScreenViewModel(private val blockRepository: BlockRepository) : ViewModel() {
   val uiState: StateFlow<MainScreenUiState> =
-    dataRepository.data
-      .map<List<String>, MainScreenUiState>(::Success)
+    blockRepository.allBlocks
+      .map<List<BlockEntity>, MainScreenUiState>(::Success)
       .catch { emit(MainScreenUiState.Error(it)) }
       .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MainScreenUiState.Loading)
+  fun insertTestBlock(){
+    viewModelScope.launch{
+      val block = BlockEntity(id=UUID.randomUUID().toString(),name="bloop",pixels=listOf(1,0,1,0))
+      blockRepository.insertBlock(block)
+
+    }
+  }
 }
 
 sealed interface MainScreenUiState {
@@ -23,5 +34,5 @@ sealed interface MainScreenUiState {
 
   data class Error(val throwable: Throwable) : MainScreenUiState
 
-  data class Success(val data: List<String>) : MainScreenUiState
+  data class Success(val data: List<BlockEntity>) : MainScreenUiState
 }
