@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 
 class AppContainer(context: Context) {
     private val appContext = context.applicationContext
-    suspend fun CreateBlockRepository(): BlockRepository =
+    suspend fun createBlockRepository(): BlockRepository =
         withContext(Dispatchers.IO){
             val database = BlockDatabase.getDatabase(appContext)
             val localRepository = RoomBlockRepository(database.blockDao())
