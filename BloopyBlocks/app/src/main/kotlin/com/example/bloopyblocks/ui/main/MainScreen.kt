@@ -50,6 +50,14 @@ fun MainScreen(
   var authError by remember {
     mutableStateOf<String?>(null)
   }
+  LaunchedEffect(Unit) {
+    try {
+      userId=FireBaseAuthManager().getUserId()
+    }
+    catch(exception: Exception){
+      authError=exception.message
+    }
+  }
   val viewModel: MainScreenViewModel = viewModel {
     val database = BlockDatabase.getDatabase(context)
     val repository = RoomBlockRepository(database.blockDao())

@@ -1,5 +1,6 @@
 package com.example.bloopyblocks.data.remote
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.tasks.await
 
 class FireBaseAuthManager {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
