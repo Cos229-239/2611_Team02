@@ -23,6 +23,8 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -52,6 +54,7 @@ import com.example.bloopyblocks.ui.theme.BloopCream
 import com.example.bloopyblocks.ui.theme.BloopDark
 import com.example.bloopyblocks.ui.theme.BloopGrass
 import com.example.bloopyblocks.ui.theme.BloopGray
+import com.example.bloopyblocks.ui.theme.BloopIconGray
 import com.example.bloopyblocks.ui.theme.BloopSky
 import com.example.bloopyblocks.ui.theme.BloopTeal
 import com.example.bloopyblocks.ui.theme.BloopTitleFont
@@ -94,6 +97,28 @@ internal fun MainScreen(
     Scaffold(
         modifier = modifier,
         containerColor = BloopCream,
+        bottomBar = {
+            NavigationBar(containerColor = Color.White, tonalElevation = 0.dp) {
+                NavigationBarItem(
+                    false,
+onClick = {onItemClick(World) },
+                    icon ={Box(Modifier.size(22.dp).background(BloopIconGray, RoundedCornerShape(6.dp)))},
+                    label={ Text("Build", fontFamily = BloopBodyFont)}
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { onItemClick(Draw) },
+                    icon = { Box(Modifier.size(22.dp).background(BloopIconGray, RoundedCornerShape(6.dp))) },
+                    label = { Text("Draw", fontFamily = BloopBodyFont) }
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { onItemClick(Gallery) },
+                    icon = { Box(Modifier.size(22.dp).background(BloopIconGray, RoundedCornerShape(6.dp))) },
+                    label = { Text("My Blocks", fontFamily = BloopBodyFont) }
+                )
+            }
+        },
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.app_name), fontFamily = BloopTitleFont) },
