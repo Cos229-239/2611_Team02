@@ -4,31 +4,10 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.Typography
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,12 +26,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,24 +39,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bloopyblocks.R
-import com.example.bloopyblocks.ui.theme.BloopyBlocksTheme
-
-//waiting on engy for shared ui colors
-private val BackgroundColor: Color = Color(0xFFFFF9EE)
-private val TextColor: Color = Color(0xFF24324A)
-private val AccentColor: Color = Color(0xFF42C5B5)
-private val MutedColor: Color = Color(0xFF5B6678)
-private val LinenColor: Color = Color(0xFFE7E0D4)
-private val CreamDeepColor: Color = Color(0xFFFFF3D6)
-private val IconGrayColor: Color = Color(0xFFD9DEE7)
-
-//waiting on engy to move the fonts into the shared theme
-private val TitleFont: FontFamily = FontFamily(
-    Font(R.font.fredoka_semibold, weight = FontWeight.SemiBold)
-)
-private val BodyFont: FontFamily = FontFamily(
-    Font(R.font.nunito_bold, weight = FontWeight.Bold)
-)
+import com.example.bloopyblocks.ui.theme.*
 
 //waiting on alejandro and tyreece for shared block data
 data class GalleryBlock(
@@ -99,9 +60,9 @@ fun GalleryScreen(
     onNewBlock: () -> Unit,
     //waiting on jace to use the selected block in the world
     onBlockSelected: (GalleryBlock) -> Unit,
-    //waiting on engy for navigation
     onBuild: () -> Unit,
     onDraw: () -> Unit,
+    onBackToHome: () -> Unit,
     modifier: Modifier = Modifier,
     selectedBlockId: String? = null
 ) {
@@ -112,33 +73,33 @@ fun GalleryScreen(
         "$blockCount blocks created"
     }
     val bodyStyle: TextStyle = TextStyle(
-        fontFamily = BodyFont,
+        fontFamily = BloopBodyFont,
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
-        color = TextColor
+        color = BloopDark
     )
-    val galleryTypography: Typography = MaterialTheme.typography.copy(
+    val galleryTypography = MaterialTheme.typography.copy(
         headlineSmall = TextStyle(
-            fontFamily = TitleFont,
+            fontFamily = BloopTitleFont,
             fontWeight = FontWeight.SemiBold,
             fontSize = 28.sp,
-            color = TextColor
+            color = BloopDark
         ),
         bodyMedium = bodyStyle,
         labelMedium = bodyStyle,
         labelLarge = TextStyle(
-            fontFamily = TitleFont,
+            fontFamily = BloopTitleFont,
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
-            color = TextColor
+            color = BloopDark
         )
     )
 
     MaterialTheme(typography = galleryTypography) {
         Scaffold(
             modifier = modifier,
-            containerColor = BackgroundColor,
-            contentColor = TextColor,
+            containerColor = BloopCream,
+            contentColor = BloopDark,
             bottomBar = { GalleryNavigation(onBuild, onDraw) }
         ) { padding: PaddingValues ->
             LazyVerticalGrid(
@@ -149,17 +110,29 @@ fun GalleryScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
-                    Column {
-                        Text(
-                            text = "My Blocks",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                        Text(
-                            text = countText,
-                            modifier = Modifier.padding(top = 4.dp),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MutedColor
-                        )
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "My Blocks",
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                            Text(
+                                text = countText,
+                                modifier = Modifier.padding(top = 4.dp),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = BloopGray
+                            )
+                        }
+                        IconButton(onClick = onBackToHome) {
+                            Text(
+                                text = "\u2190",
+                                color = BloopDark,
+                                fontSize = 24.sp,
+                                modifier = Modifier.clearAndSetSemantics {
+                                    contentDescription = "Back to Home"
+                                }
+                            )
+                        }
                     }
                 }
                 items(blocks, key = { block: GalleryBlock -> block.id }) { block: GalleryBlock ->
@@ -181,7 +154,7 @@ fun GalleryScreen(
 private fun Modifier.flatShadow(radius: Dp, depth: Dp): Modifier {
     return this.padding(bottom = depth).drawBehind {
         drawRoundRect(
-            color = LinenColor,
+            color = BloopLinen,
             topLeft = Offset(0f, depth.toPx()),
             size = size,
             cornerRadius = CornerRadius(radius.toPx())
@@ -195,7 +168,7 @@ private fun BlockCard(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val cardColor: Color = if (isSelected) CreamDeepColor else Color.White
+    val cardColor: Color = if (isSelected) BloopCreamDeep else Color.White
 
     Box(
         modifier = Modifier.fillMaxWidth().flatShadow(radius = 16.dp, depth = 4.dp)
@@ -206,7 +179,7 @@ private fun BlockCard(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = cardColor,
-                contentColor = TextColor
+                contentColor = BloopDark
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
@@ -249,7 +222,7 @@ private fun BlockArtwork(block: GalleryBlock) {
                 val pixel: Int = block.pixels[row * 8 + column]
                 val inset: Float = if (pixel == 0) emptyGap else 0f
                 val radius: Float = if (pixel == 0) emptyRadius else 0f
-                val pixelColor: Color = if (pixel == 0) LinenColor else Color(pixel)
+                val pixelColor: Color = if (pixel == 0) BloopLinen else Color(pixel)
 
                 drawRoundRect(
                     color = pixelColor,
@@ -278,7 +251,7 @@ private fun NewBlockCard(onClick: () -> Unit) {
             .drawBehind {
                 val borderWidth: Float = 2.dp.toPx()
                 drawRoundRect(
-                    color = AccentColor,
+                    color = BloopTeal,
                     topLeft = Offset(borderWidth / 2f, borderWidth / 2f),
                     size = Size(size.width - borderWidth, size.height - borderWidth),
                     cornerRadius = CornerRadius(16.dp.toPx()),
@@ -332,7 +305,7 @@ private fun BloopMessage(blockCount: Int) {
                 .flatShadow(radius = 14.dp, depth = 3.dp),
             shape = RoundedCornerShape(14.dp),
             color = Color.White,
-            contentColor = TextColor,
+            contentColor = BloopDark,
             shadowElevation = 0.dp
         ) {
             Text(
@@ -344,7 +317,6 @@ private fun BloopMessage(blockCount: Int) {
     }
 }
 
-//waiting on engy for home and ui setup to attach
 @Composable
 private fun GalleryNavigation(onBuild: () -> Unit, onDraw: () -> Unit) {
     NavigationBar(containerColor = Color.White, tonalElevation = 0.dp) {
@@ -352,7 +324,7 @@ private fun GalleryNavigation(onBuild: () -> Unit, onDraw: () -> Unit) {
             selected = false,
             onClick = onBuild,
             icon = {
-                Box(Modifier.size(22.dp).background(IconGrayColor, RoundedCornerShape(6.dp)))
+                Box(Modifier.size(22.dp).background(BloopIconGray, RoundedCornerShape(6.dp)))
             },
             label = {
                 Text("Build", style = MaterialTheme.typography.bodyMedium)
@@ -362,7 +334,7 @@ private fun GalleryNavigation(onBuild: () -> Unit, onDraw: () -> Unit) {
             selected = false,
             onClick = onDraw,
             icon = {
-                Box(Modifier.size(22.dp).background(IconGrayColor, RoundedCornerShape(6.dp)))
+                Box(Modifier.size(22.dp).background(BloopIconGray, RoundedCornerShape(6.dp)))
             },
             label = {
                 Text("Draw", style = MaterialTheme.typography.bodyMedium)
@@ -372,13 +344,13 @@ private fun GalleryNavigation(onBuild: () -> Unit, onDraw: () -> Unit) {
             selected = true,
             onClick = {},
             icon = {
-                Box(Modifier.size(22.dp).background(AccentColor, RoundedCornerShape(6.dp)))
+                Box(Modifier.size(22.dp).background(BloopTeal, RoundedCornerShape(6.dp)))
             },
             label = {
                 Text("My Blocks", style = MaterialTheme.typography.bodyMedium)
             },
             colors = NavigationBarItemDefaults.colors(
-                selectedTextColor = TextColor,
+                selectedTextColor = BloopDark,
                 indicatorColor = Color.Transparent
             )
         )
@@ -442,6 +414,7 @@ private fun GalleryScreenPreview() {
             onBlockSelected = { block: GalleryBlock -> selectedBlockId = block.id },
             onBuild = {},
             onDraw = {},
+            onBackToHome = {},
             selectedBlockId = selectedBlockId
         )
     }
@@ -456,9 +429,8 @@ private fun EmptyGalleryScreenPreview() {
             onNewBlock = {},
             onBlockSelected = {},
             onBuild = {},
-            onDraw = {}
+            onDraw = {},
+            onBackToHome = {}
         )
     }
 }
-
-
