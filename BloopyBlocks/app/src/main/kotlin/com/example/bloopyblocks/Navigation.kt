@@ -24,17 +24,22 @@ fun MainNavigation() {
         entry<Main> {
           MainScreen(onItemClick = { navKey -> backStack.add(navKey) })
         }
-        entry< Draw>{
-                  Text("Draw screen...")
+        entry<Draw> {
+          Text("Draw screen...")
         }
         entry<Gallery> {
           GalleryScreen(
-          blocks = emptyList(),
-          onNewBlock = { backStack.add(Draw) },
-          onBlockSelected = {},
-          onBuild = { backStack.add(World) },
-          onDraw = { backStack.add(Draw) },
-           )
+            blocks = emptyList(),
+            onNewBlock = { backStack.add(Draw) },
+            onBlockSelected = {},
+            onBuild = { backStack.add(World) },
+            onDraw = { backStack.add(Draw) },
+            onBackToHome = {
+              while (backStack.size > 1) {
+                backStack.removeLastOrNull()
+              }
+            },
+          )
         }
         entry<World> {
           Text("World screen...")
