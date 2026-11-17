@@ -11,30 +11,15 @@ import androidx.compose.ui.Modifier
 import com.example.bloopyblocks.ui.theme.BloopyBlocksTheme
 import com.google.firebase.auth.FirebaseAuth
 import android.util.Log
-
+import com.example.bloopyblocks.data.remote.FireBaseAuthManager
 
 
 class MainActivity : ComponentActivity() {
   private lateinit var auth: FirebaseAuth
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    auth = FirebaseAuth.getInstance()
-    if (auth.currentUser == null) {
-      auth.signInAnonymously()
-        .addOnCompleteListener(this) { task ->
-          if (task.isSuccessful) {
-            val user = auth.currentUser
-            Log.d("BloopyBlocks", "Anonymous sign-in successful!")
-            Log.d("BloopyBlocks", "User ID: ${user?.uid}")
-          } else {
-            Log.e(
-              "BloopyBlocks",
-              "Anonymous sign-in failed",
-              task.exception
-            )
-          }
-        }
-    }
+    val authManager = FireBaseAuthManager()
+    authManager.signInAnonymously(onSuccess = {userId->Log.d("FireBaseAuth", "Signed in with user id $userId")}, onFailure={exception -> Log.e("FireBaseAuth", "Sign in Failed", exception)})
     enableEdgeToEdge()
     setContent {
 
