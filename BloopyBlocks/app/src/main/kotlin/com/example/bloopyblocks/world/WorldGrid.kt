@@ -50,6 +50,8 @@ class WorldGrid(val width: Int = 12, val height: Int = 8) {
     fun toWorld(id: String, name: String) =
         World(id = id, name = name, width = width, height = height, cells = cells.toList())
 
+    fun snapshot(): List<String> = cells.toList()
+
     private fun saveForUndo() {
         undoStack.addLast(cells.toList())
         if (undoStack.size > 50) undoStack.removeFirst()
