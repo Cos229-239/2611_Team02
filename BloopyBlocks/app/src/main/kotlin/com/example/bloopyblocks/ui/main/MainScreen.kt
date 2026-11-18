@@ -80,7 +80,7 @@ fun MainScreen(
     }
     LaunchedEffect(Unit) {
         try {
-            repository = appContainer.createBlockRepository()
+            repository = appContainer.getBlockRepository()
         } catch (exception: Exception) {
             authError = exception.message
         }
