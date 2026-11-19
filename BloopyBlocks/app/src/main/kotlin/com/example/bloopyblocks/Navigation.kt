@@ -11,16 +11,25 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.bloopyblocks.ui.gallery.GalleryScreen
 import com.example.bloopyblocks.ui.main.MainScreen
+import com.example.bloopyblocks.ui.welcome.WelcomeScreen
 
 @Composable
 fun MainNavigation() {
-  val backStack = rememberNavBackStack(Main)
+  val backStack = rememberNavBackStack(Welcome)
 
   NavDisplay(
     backStack = backStack,
     onBack = { backStack.removeLastOrNull() },
     entryProvider =
       entryProvider {
+        entry <Welcome>{
+          WelcomeScreen(
+            onStart = {
+              backStack.add(Main)
+              backStack.remove(Welcome)
+            }
+          )
+        }
         entry<Main> {
           MainScreen(onItemClick = { navKey -> backStack.add(navKey) })
         }

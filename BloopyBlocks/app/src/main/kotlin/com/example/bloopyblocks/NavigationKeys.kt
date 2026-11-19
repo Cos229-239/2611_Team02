@@ -8,3 +8,4 @@ import kotlinx.serialization.Serializable
 @Serializable data object Draw : NavKey
 @Serializable data object Gallery : NavKey
 @Serializable data object World : NavKey
+@Serializable data object Welcome : NavKey
