@@ -8,13 +8,25 @@ import kotlinx.coroutines.withContext
 
 class AppContainer(context: Context) {
     private val appContext = context.applicationContext
-    suspend fun createBlockRepository(): BlockRepository =
-        withContext(Dispatchers.IO){
-            val database = BlockDatabase.getDatabase(appContext)
-            val localRepository = RoomBlockRepository(database.blockDao())
-            val userId = FireBaseAuthManager().getUserId()
-            val RemoteRepository = FireStoreBlockRepository(com.google.firebase.firestore.FirebaseFirestore.getInstance(), userId)
-            CombinedBlockRepository(localRepository, RemoteRepository)
+    private var blockRepository: BlockRepository?=null
+    suspend fun getBlockRepository(): BlockRepository {
+        if (blockRepository == null) {
+
+
+            blockRepository = withContext(Dispatchers.IO) {
+                val database = BlockDatabase.getDatabase(appContext)
+                val localRepository = RoomBlockRepository(database.blockDao())
+                val userId = FireBaseAuthManager().getUserId()
+                val RemoteRepository = FireStoreBlockRepository(
+                    com.google.firebase.firestore.FirebaseFirestore.getInstance(),
+                    userId
+                )
+                CombinedBlockRepository(localRepository, RemoteRepository)
+
+            }
+
 
         }
+        return blockRepository!!
+    }
 }
