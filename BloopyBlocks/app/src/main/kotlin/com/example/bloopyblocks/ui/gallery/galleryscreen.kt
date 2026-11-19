@@ -9,8 +9,10 @@ import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -24,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -38,8 +41,91 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.flowWithLifecycle
+import com.example.bloopyblocks.BloopyBlocksApplication
 import com.example.bloopyblocks.R
 import com.example.bloopyblocks.ui.theme.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.collect
+
+@Composable
+fun GalleryRoute(
+    onNewBlock: () -> Unit,
+    onBlockSelected: (GalleryBlock) -> Unit,
+    onBuild: () -> Unit,
+    onDraw: () -> Unit,
+    onBackToHome: () -> Unit
+) {
+    val application = LocalContext.current.applicationContext as BloopyBlocksApplication
+    val appContainer = application.appContainer
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    var blocks by remember { mutableStateOf<List<GalleryBlock>?>(null) }
+    var loadFailed by remember { mutableStateOf(false) }
+    var retryCount by remember { mutableStateOf(0) }
+
+    LaunchedEffect(appContainer, lifecycle, retryCount) {
+        loadFailed = false
+        try {
+            val repository = appContainer.getBlockRepository()
+            repository.allBlocks.flowWithLifecycle(lifecycle).collect { savedBlocks ->
+                blocks = savedBlocks
+                    .filter { block -> block.pixels.size == 64 }
+                    .map { block ->
+                        GalleryBlock(
+                            id = block.id,
+                            name = block.name,
+                            pixels = block.pixels
+                        )
+                    }
+            }
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            loadFailed = true
+        }
+    }
+
+    val savedBlocks = blocks
+    when {
+        loadFailed -> {
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .background(BloopCream)
+                    .safeDrawingPadding()
+                    .padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text("Couldn't load your saved blocks.", color = BloopDark)
+                TextButton(onClick = { retryCount += 1 }) {
+                    Text("Try again")
+                }
+                TextButton(onClick = onBackToHome) {
+                    Text("Back to Home")
+                }
+            }
+        }
+        savedBlocks == null -> {
+            Box(
+                modifier = Modifier.fillMaxSize().background(BloopCream),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = BloopTeal)
+            }
+        }
+        else -> {
+            GalleryScreen(
+                blocks = savedBlocks,
+                onNewBlock = onNewBlock,
+                onBlockSelected = onBlockSelected,
+                onBuild = onBuild,
+                onDraw = onDraw,
+                onBackToHome = onBackToHome
+            )
+        }
+    }
+}
 
 //waiting on alejandro and tyreece for shared block data
 data class GalleryBlock(
@@ -54,7 +140,6 @@ data class GalleryBlock(
 
 @Composable
 fun GalleryScreen(
-    //waiting on tyreece for saved blocks
     blocks: List<GalleryBlock>,
     //waiting on engy and alejandro to connect the drawing screen
     onNewBlock: () -> Unit,

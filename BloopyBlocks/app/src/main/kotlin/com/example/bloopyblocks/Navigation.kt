@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.example.bloopyblocks.ui.gallery.GalleryScreen
+import com.example.bloopyblocks.ui.gallery.GalleryRoute
 import com.example.bloopyblocks.ui.main.MainScreen
 import com.example.bloopyblocks.ui.welcome.WelcomeScreen
 
@@ -37,8 +37,7 @@ fun MainNavigation() {
           Text("Draw screen...")
         }
         entry<Gallery> {
-          GalleryScreen(
-            blocks = emptyList(),
+          GalleryRoute(
             onNewBlock = { backStack.add(Draw) },
             onBlockSelected = {},
             onBuild = { backStack.add(World) },
