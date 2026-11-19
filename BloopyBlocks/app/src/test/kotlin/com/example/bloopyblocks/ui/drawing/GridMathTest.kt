@@ -5,7 +5,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-// square lookups, the fill-in between touch samples, and which squares join
+// square lookups, the fill-in between touch samples, which squares join, and what a fill takes
 class GridMathTest
 {
     // inside width on the medium phone, the 379 card minus 1 dp padding each side
@@ -124,5 +124,23 @@ class GridMathTest
         assertEquals(teal, getCrossingColor(grid(listOf("TT", "TT")), 0, 0))
         assertEquals(0, getCrossingColor(grid(listOf("TT", "T.")), 0, 0))
         assertEquals(0, getCrossingColor(grid(listOf("T.", ".T")), 0, 0))
+    }
+
+    // a fill takes the whole patch nearest first, corners don't count, empty squares fill too, so does erase
+    @Test
+    fun fillTakesThePatchNearestFirst()
+    {
+        assertEquals(listOf(0, 8, 1, 9), findFillSquares(grid(listOf("TT.", "TTN", "..T")), 0, navy))
+        val fromMiddle = findFillSquares(grid(listOf(".")), 27, teal)
+        assertEquals(listOf(27, 19, 35, 26, 28, 11, 18, 20), fromMiddle.take(8))
+        assertEquals(GRID_SQUARE_COUNT, fromMiddle.size)
+        assertEquals(listOf(0, 1), findFillSquares(grid(listOf("TT")), 0, 0))
+    }
+
+    // a fill with the color that's already there changes nothing
+    @Test
+    fun fillSameColorIsEmpty()
+    {
+        assertEquals(emptyList<Int>(), findFillSquares(grid(listOf("TT")), 0, teal))
     }
 }
