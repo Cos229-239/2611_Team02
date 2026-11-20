@@ -20,5 +20,13 @@ interface WorldDao {
     suspend fun getWorldById(id: String): WorldEntity?
     @Query("SELECT * FROM world_block WHERE worldId = :worldId")
     fun getBlocksForWorld(worldId: String): Flow<List<WorldBlockEntity>>
+    @Insert
+    suspend fun insertWorldBlock(placement: WorldBlockEntity)
+    @Update
+    suspend fun addWorldBlock(placement: WorldBlockEntity)
+    @Delete
+    suspend fun deleteWorldBlock(placement: WorldBlockEntity)
+    @Query("DELETE FROM world_block WHERE worldId = :worldId")
+    suspend fun deleteAllWorldBlocks(worldId: String)
 }
 
