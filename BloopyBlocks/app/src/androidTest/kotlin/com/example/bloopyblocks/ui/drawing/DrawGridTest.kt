@@ -3,6 +3,7 @@ package com.example.bloopyblocks.ui.drawing
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -14,6 +15,14 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+
+// returns the middle of a square in px, width is the grid's width
+fun getSquareCenter(index: Int, width: Int): Offset
+{
+    val x = width * ((index % GRID_SIZE) + 0.5f) / GRID_SIZE
+    val y = width * ((index / GRID_SIZE) + 0.5f) / GRID_SIZE
+    return Offset(x, y)
+}
 
 // finger tests for the grid, run on the emulator
 class DrawGridTest
@@ -29,10 +38,15 @@ class DrawGridTest
     private var strokeStarts = 0
     private var strokeEnds = 0
 
+    // what a touch on the grid does, a test can switch it, and how many squares the grid reported
+    private val touchMode = mutableIntStateOf(GRID_TOUCH_PAINT)
+    private var paintCalls = 0
+
     // paints one square, the grid calls this
     private fun paintSquare(index: Int)
     {
         pixels[index] = teal
+        paintCalls++
     }
 
     // counts a finger going down
@@ -61,14 +75,6 @@ class DrawGridTest
         return count
     }
 
-    // returns the middle of a square in px, width is the grid's width
-    private fun centerOf(index: Int, width: Int): Offset
-    {
-        val x = width * ((index % GRID_SIZE) + 0.5f) / GRID_SIZE
-        val y = width * ((index / GRID_SIZE) + 0.5f) / GRID_SIZE
-        return Offset(x, y)
-    }
-
     // puts an empty grid on the screen at the medium phone's card width
     @Before
     fun setup()
@@ -80,7 +86,7 @@ class DrawGridTest
         composeTestRule.setContent {
             Box(Modifier.width(379.dp))
             {
-                DrawGrid(pixels, teal, ::paintSquare, ::startStroke, ::endStroke, Modifier)
+                DrawGrid(pixels, teal, touchMode.intValue, ::paintSquare, ::startStroke, ::endStroke, Modifier)
             }
         }
     }
@@ -97,7 +103,7 @@ class DrawGridTest
     fun tapPaintsOneSquare()
     {
         composeTestRule.onNodeWithContentDescription(GRID_LABEL).performTouchInput {
-            down(centerOf(0, width))
+            down(getSquareCenter(0, width))
             up()
         }
         assertEquals(teal, pixels[0])
@@ -111,8 +117,8 @@ class DrawGridTest
     fun fastSwipeFillsTheRow()
     {
         composeTestRule.onNodeWithContentDescription(GRID_LABEL).performTouchInput {
-            down(centerOf(0, width))
-            moveTo(centerOf(7, width))
+            down(getSquareCenter(0, width))
+            moveTo(getSquareCenter(7, width))
             up()
         }
         for (i in 0 until GRID_SIZE)
@@ -127,13 +133,38 @@ class DrawGridTest
     fun secondFingerPaintsNothing()
     {
         composeTestRule.onNodeWithContentDescription(GRID_LABEL).performTouchInput {
-            down(0, centerOf(0, width))
-            down(1, centerOf(27, width))
+            down(0, getSquareCenter(0, width))
+            down(1, getSquareCenter(27, width))
             up(1)
             up(0)
         }
         assertEquals(1, countPainted())
         assertEquals(1, strokeStarts)
         assertEquals(1, strokeEnds)
+    }
+
+    // with pick on a finger down reports its one square, a drag and the rim add nothing, and off takes nothing
+    @Test
+    fun pickReportsOnceAndOffTakesNothing()
+    {
+        touchMode.intValue = GRID_TOUCH_PICK
+        composeTestRule.onNodeWithContentDescription(GRID_LABEL).performTouchInput {
+            down(getSquareCenter(9, width))
+            moveTo(getSquareCenter(12, width))
+            up()
+            down(Offset(0f, 0f))
+            up()
+        }
+        assertEquals(teal, pixels[9])
+        assertEquals(1, paintCalls)
+        touchMode.intValue = GRID_TOUCH_OFF
+        composeTestRule.onNodeWithContentDescription(GRID_LABEL).performTouchInput {
+            down(getSquareCenter(0, width))
+            moveTo(getSquareCenter(7, width))
+            up()
+        }
+        assertEquals(1, paintCalls)
+        assertEquals(0, strokeStarts)
+        assertEquals(0, strokeEnds)
     }
 }

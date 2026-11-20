@@ -20,6 +20,11 @@ const val GRID_TICK_GAP_MS = 35L
 // what talkback reads out for the grid
 const val GRID_LABEL = "Drawing grid, 8 by 8"
 
+// what a touch on the grid does, paint, pick one square for a fill, or nothing
+const val GRID_TOUCH_PAINT = 0
+const val GRID_TOUCH_PICK = 1
+const val GRID_TOUCH_OFF = 2
+
 // fill-in checks per square width along a swipe
 private const val SAMPLES_PER_SQUARE = 3
 

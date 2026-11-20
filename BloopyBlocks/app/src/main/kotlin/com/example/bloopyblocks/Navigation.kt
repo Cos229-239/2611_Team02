@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.bloopyblocks.ui.drawing.DrawRoute
 import com.example.bloopyblocks.ui.gallery.GalleryScreen
 import com.example.bloopyblocks.ui.main.MainScreen
 
@@ -25,7 +26,13 @@ fun MainNavigation() {
           MainScreen(onItemClick = { navKey -> backStack.add(navKey) })
         }
         entry<Draw> {
-          Text("Draw screen...")
+          // back from draw always lands on main, the same loop the gallery's back to home runs
+          DrawRoute {
+              while (backStack.size > 1)
+              {
+                  backStack.removeLastOrNull()
+              }
+          }
         }
         entry<Gallery> {
           GalleryScreen(
