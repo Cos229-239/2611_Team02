@@ -16,6 +16,7 @@ import com.example.bloopyblocks.ui.world.WorldScreen
 import com.example.bloopyblocks.ui.world.sampleBlocks
 import com.example.bloopyblocks.world.WorldViewModel
 import com.example.bloopyblocks.ui.welcome.WelcomeScreen
+import com.example.bloopyblocks.ui.world.WorldRoute
 
 @Composable
 fun MainNavigation() {
@@ -54,8 +55,7 @@ fun MainNavigation() {
           )
         }
         entry<World> {
-          val worldViewModel: WorldViewModel = viewModel()
-          WorldScreen(viewModel = worldViewModel, blocks = sampleBlocks)
+          WorldRoute()
         }
       },
   )
