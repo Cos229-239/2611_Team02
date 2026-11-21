@@ -9,36 +9,49 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.example.bloopyblocks.ui.gallery.GalleryScreen
+import com.example.bloopyblocks.ui.gallery.GalleryRoute
 import com.example.bloopyblocks.ui.main.MainScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bloopyblocks.ui.world.WorldScreen
 import com.example.bloopyblocks.ui.world.sampleBlocks
 import com.example.bloopyblocks.world.WorldViewModel
+import com.example.bloopyblocks.ui.welcome.WelcomeScreen
 
 @Composable
 fun MainNavigation() {
-  val backStack = rememberNavBackStack(Main)
+  val backStack = rememberNavBackStack(Welcome)
 
   NavDisplay(
     backStack = backStack,
     onBack = { backStack.removeLastOrNull() },
     entryProvider =
       entryProvider {
+        entry <Welcome>{
+          WelcomeScreen(
+            onStart = {
+              backStack.add(Main)
+              backStack.remove(Welcome)
+            }
+          )
+        }
         entry<Main> {
           MainScreen(onItemClick = { navKey -> backStack.add(navKey) })
         }
-        entry< Draw>{
-                  Text("Draw screen...")
+        entry<Draw> {
+          Text("Draw screen...")
         }
         entry<Gallery> {
-          GalleryScreen(
-          blocks = emptyList(),
-          onNewBlock = { backStack.add(Draw) },
-          onBlockSelected = {},
-          onBuild = { backStack.add(World) },
-          onDraw = { backStack.add(Draw) },
-           )
+          GalleryRoute(
+            onNewBlock = { backStack.add(Draw) },
+            onBlockSelected = {},
+            onBuild = { backStack.add(World) },
+            onDraw = { backStack.add(Draw) },
+            onBackToHome = {
+              while (backStack.size > 1) {
+                backStack.removeLastOrNull()
+              }
+            },
+          )
         }
         entry<World> {
           val worldViewModel: WorldViewModel = viewModel()

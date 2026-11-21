@@ -3,6 +3,7 @@ plugins {
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlin.serialization)
   alias(libs.plugins.google.services)
+  alias(libs.plugins.ksp)
 }
 
 android {
@@ -50,6 +51,7 @@ dependencies {
   implementation(composeBom)
   androidTestImplementation(composeBom)
 
+
   // Core Android dependencies
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -87,5 +89,9 @@ dependencies {
   implementation(libs.firebase.firestore)
   implementation(libs.firebase.auth)
 
+  // Room Database
+  implementation(libs.room.runtime)
+  implementation(libs.room.ktx)
+  ksp(libs.room.compiler)
 }
 

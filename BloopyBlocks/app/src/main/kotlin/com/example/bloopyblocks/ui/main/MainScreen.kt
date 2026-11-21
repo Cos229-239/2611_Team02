@@ -23,6 +23,8 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -52,34 +54,76 @@ import com.example.bloopyblocks.ui.theme.BloopCream
 import com.example.bloopyblocks.ui.theme.BloopDark
 import com.example.bloopyblocks.ui.theme.BloopGrass
 import com.example.bloopyblocks.ui.theme.BloopGray
+import com.example.bloopyblocks.ui.theme.BloopIconGray
 import com.example.bloopyblocks.ui.theme.BloopSky
 import com.example.bloopyblocks.ui.theme.BloopTeal
 import com.example.bloopyblocks.ui.theme.BloopTitleFont
 import com.example.bloopyblocks.ui.theme.BloopyBlocksTheme
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.example.bloopyblocks.BloopyBlocksApplication
+import com.example.bloopyblocks.data.BlockRepository
+import com.example.bloopyblocks.data.local.BlockEntity
 
 @Composable
 fun MainScreen(
     onItemClick: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MainScreenViewModel = viewModel { MainScreenViewModel(DefaultDataRepository()) },
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    when (val state = uiState) {
-        MainScreenUiState.Loading -> {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
+    val context = LocalContext.current.applicationContext
+    val appContainer = (context as BloopyBlocksApplication).appContainer
+    var repository by remember {
+        mutableStateOf<BlockRepository?>(null)
+    }
+    var authError by remember {
+        mutableStateOf<String?>(null)
+    }
+    LaunchedEffect(Unit) {
+        try {
+            repository = appContainer.getBlockRepository()
+        } catch (exception: Exception) {
+            authError = exception.message
+        }
+    }
+    val currentRepository = repository
+    when {
+        authError != null -> {
+            Text("error intializing repository: $authError")
+        }
+
+        currentRepository == null -> {
+            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
 
-        is MainScreenUiState.Success -> {
-            MainScreen(data = state.data, modifier = modifier, onItemClick = onItemClick)
-        }
+        else -> {
+            val viewModel: MainScreenViewModel = viewModel {
+                MainScreenViewModel(currentRepository)
+            }
 
-        is MainScreenUiState.Error -> {
-            Text("Error loading data: ${state.throwable.message}")
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            when (val state = uiState) {
+                MainScreenUiState.Loading -> {
+                    Box(
+                        modifier = modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                is MainScreenUiState.Success -> {
+                    MainScreen(data = state.data, modifier = modifier, onItemClick = onItemClick)
+                }
+
+                is MainScreenUiState.Error -> {
+                    Text("Error loading data: ${state.throwable.message}")
+                }
+            }
         }
     }
 }
@@ -87,13 +131,35 @@ fun MainScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MainScreen(
-    data: List<String>,
+    data: List<BlockEntity>,
     modifier: Modifier = Modifier,
     onItemClick: (NavKey) -> Unit = {}
 ) {
     Scaffold(
         modifier = modifier,
         containerColor = BloopCream,
+        bottomBar = {
+            NavigationBar(containerColor = Color.White, tonalElevation = 0.dp) {
+                NavigationBarItem(
+                    false,
+onClick = {onItemClick(World) },
+                    icon ={Box(Modifier.size(22.dp).background(BloopIconGray, RoundedCornerShape(6.dp)))},
+                    label={ Text("Build", fontFamily = BloopBodyFont)}
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { onItemClick(Draw) },
+                    icon = { Box(Modifier.size(22.dp).background(BloopIconGray, RoundedCornerShape(6.dp))) },
+                    label = { Text("Draw", fontFamily = BloopBodyFont) }
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { onItemClick(Gallery) },
+                    icon = { Box(Modifier.size(22.dp).background(BloopIconGray, RoundedCornerShape(6.dp))) },
+                    label = { Text("My Blocks", fontFamily = BloopBodyFont) }
+                )
+            }
+        },
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.app_name), fontFamily = BloopTitleFont) },
@@ -230,6 +296,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
-    BloopyBlocksTheme { MainScreen(listOf("Android")) }
+    BloopyBlocksTheme { MainScreen(emptyList()) }
 }
 
