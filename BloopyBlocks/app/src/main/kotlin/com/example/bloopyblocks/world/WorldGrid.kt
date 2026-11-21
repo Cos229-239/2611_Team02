@@ -2,8 +2,7 @@ package com.example.bloopyblocks.world
 
 import com.example.bloopyblocks.data.World
 
-class WorldGrid(val width: Int = 12, val height: Int = 8) {
-
+class WorldGrid(val width: Int = 8, val height: Int = 8) {
     init { require(width > 0 && height > 0) { "Grid must have a positive size" } }
 
     // One flat list, row by row. "" means an empty cell.

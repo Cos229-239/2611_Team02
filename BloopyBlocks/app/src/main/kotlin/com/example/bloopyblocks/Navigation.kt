@@ -11,6 +11,10 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.bloopyblocks.ui.gallery.GalleryScreen
 import com.example.bloopyblocks.ui.main.MainScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.bloopyblocks.ui.world.WorldScreen
+import com.example.bloopyblocks.ui.world.sampleBlocks
+import com.example.bloopyblocks.world.WorldViewModel
 
 @Composable
 fun MainNavigation() {
@@ -37,7 +41,8 @@ fun MainNavigation() {
            )
         }
         entry<World> {
-          Text("World screen...")
+          val worldViewModel: WorldViewModel = viewModel()
+          WorldScreen(viewModel = worldViewModel, blocks = sampleBlocks)
         }
       },
   )
