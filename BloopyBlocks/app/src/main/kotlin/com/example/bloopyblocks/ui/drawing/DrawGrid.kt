@@ -42,6 +42,7 @@ private const val SEAM_PX = 1f
 fun DrawGrid(
     pixels: List<Int>,
     paintColor: Int,
+    touchMode: Int,
     onPaint: (Int) -> Unit,
     onStrokeStart: () -> Unit,
     onStrokeEnd: () -> Unit,
@@ -54,6 +55,7 @@ fun DrawGrid(
     // the touch code keeps running between redraws, these always hold the newest values
     val pixelsNow = rememberUpdatedState(pixels)
     val colorNow = rememberUpdatedState(paintColor)
+    val modeNow = rememberUpdatedState(touchMode)
     val onPaintNow = rememberUpdatedState(onPaint)
     val onStartNow = rememberUpdatedState(onStrokeStart)
     val onEndNow = rememberUpdatedState(onStrokeEnd)
@@ -72,11 +74,20 @@ fun DrawGrid(
                     val event = awaitPointerEvent()
                     val pad = GridPadding.value * density
                     val innerWidth = size.width - pad * 2
+                    // a pick only counts when no stroke was open as this event came in
+                    val canPick = modeNow.value == GRID_TOUCH_PICK && !painter.isDrawing()
                     for (i in 0 until event.changes.size)
                     {
                         val change = event.changes[i]
-                        val squares = handleFinger(painter, change, pad, innerWidth, pixelsNow.value, colorNow.value, onStartNow.value, onEndNow.value)
-                        paintSquares(squares, painter, change.uptimeMillis, haptic, onPaintNow.value)
+                        if (modeNow.value == GRID_TOUCH_PAINT)
+                        {
+                            val squares = handleFinger(painter, change, pad, innerWidth, pixelsNow.value, colorNow.value, onStartNow.value, onEndNow.value)
+                            paintSquares(squares, painter, change.uptimeMillis, haptic, onPaintNow.value)
+                        }
+                        else
+                        {
+                            handleIdleFinger(painter, change, pad, innerWidth, canPick, onPaintNow.value, onEndNow.value)
+                        }
                         change.consume()
                     }
                 }
@@ -132,6 +143,28 @@ private fun handleFinger(
     return emptyList()
 }
 
+// outside paint mode a finger ends an open stroke, and a new finger can pick the one square it lands on
+private fun handleIdleFinger(
+    painter: StrokePainter,
+    change: PointerInputChange,
+    pad: Float,
+    innerWidth: Float,
+    canPick: Boolean,
+    onPaint: (Int) -> Unit,
+    onStrokeEnd: () -> Unit
+)
+{
+    if (painter.up(change.id.value))
+    {
+        onStrokeEnd()
+    }
+    val square = findSquareAt(change.position.x - pad, change.position.y - pad, innerWidth)
+    if (canPick && square != -1 && change.pressed && !change.previousPressed)
+    {
+        onPaint(square)
+    }
+}
+
 // sends each square to onPaint, then one light buzz if the painter says it's time
 private fun paintSquares(squares: List<Int>, painter: StrokePainter, time: Long, haptic: HapticFeedback, onPaint: (Int) -> Unit)
 {
@@ -158,7 +191,7 @@ private fun getBackSwipeRect(width: Float, height: Float, density: Float): Rect
 }
 
 // turns dp into px for this screen
-private fun toPx(scope: DrawScope, dp: Dp): Float
+fun toPx(scope: DrawScope, dp: Dp): Float
 {
     return dp.value * scope.density
 }
@@ -170,7 +203,7 @@ private fun getSquarePx(scope: DrawScope): Float
 }
 
 // returns the fill for a square, linen when it's empty
-private fun getSquareColor(color: Int): Color
+fun getSquareColor(color: Int): Color
 {
     if (color == 0)
     {
