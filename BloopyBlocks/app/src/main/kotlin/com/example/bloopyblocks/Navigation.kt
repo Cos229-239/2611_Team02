@@ -12,7 +12,12 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.bloopyblocks.ui.drawing.DrawRoute
 import com.example.bloopyblocks.ui.gallery.GalleryRoute
 import com.example.bloopyblocks.ui.main.MainScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.bloopyblocks.ui.world.WorldScreen
+import com.example.bloopyblocks.ui.world.sampleBlocks
+import com.example.bloopyblocks.world.WorldViewModel
 import com.example.bloopyblocks.ui.welcome.WelcomeScreen
+import com.example.bloopyblocks.ui.world.WorldRoute
 
 @Composable
 fun MainNavigation() {
@@ -57,7 +62,7 @@ fun MainNavigation() {
           )
         }
         entry<World> {
-          Text("World screen...")
+          WorldRoute()
         }
       },
   )
