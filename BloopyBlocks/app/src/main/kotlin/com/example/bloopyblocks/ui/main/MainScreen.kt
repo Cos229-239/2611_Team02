@@ -187,7 +187,12 @@ onClick = {onItemClick(World) },
                 modifier = Modifier.padding(24.dp, 16.dp)
             )
             Text(
-                text = "Welcome back, builder!",
+                // shows how many blocks are saved, or asks to draw the first one
+                text = when (data.size) {
+                    0 -> "Draw your first block!"
+                    1 -> "You have 1 block"
+                    else -> "You have ${data.size} blocks"
+                },
                 fontSize = 14.sp,
                 fontFamily = BloopBodyFont,
                 color = BloopGray,
