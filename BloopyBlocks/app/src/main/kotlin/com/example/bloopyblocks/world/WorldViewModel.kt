@@ -2,6 +2,7 @@ package com.example.bloopyblocks.world
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.bloopyblocks.data.RoomWorldRepository
 import com.example.bloopyblocks.data.World
 import com.example.bloopyblocks.data.WorldMode
 import com.example.bloopyblocks.data.WorldRepository
@@ -11,16 +12,10 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-class WorldViewModel(
-    private val worldRepository: WorldRepository? = null,
-    private var grid: WorldGrid = WorldGrid()
-) : ViewModel() {
+class WorldViewModel(private val worldRepository: WorldRepository?=null, var grid: WorldGrid = WorldGrid()) : ViewModel() {
 
-    val gridWidth: Int
-        get() = grid.width
-
-    val gridHeight: Int
-        get() = grid.height
+    val gridWidth: Int = grid.width
+    val gridHeight: Int = grid.height
 
     private val _cells = MutableStateFlow(grid.snapshot())
     val cells: StateFlow<List<String>> = _cells
@@ -31,6 +26,8 @@ class WorldViewModel(
     private val _selectedBlockId = MutableStateFlow<String?>(null)
     val selectedBlockId: StateFlow<String?> = _selectedBlockId
 
+    fun setMode(newMode: WorldMode) { _mode.value = newMode }
+    fun selectBlock(id: String) { _selectedBlockId.value = id }
     // All worlds saved in the repository
     private val _savedWorlds = MutableStateFlow<List<World>>(emptyList())
     val savedWorlds: StateFlow<List<World>> = _savedWorlds
@@ -55,40 +52,18 @@ class WorldViewModel(
         }
     }
 
-    fun setMode(newMode: WorldMode) {
-        _mode.value = newMode
-    }
 
-    fun selectBlock(id: String) {
-        _selectedBlockId.value = id
-    }
 
     fun onCellTapped(x: Int, y: Int) {
         val changed = when (_mode.value) {
-            WorldMode.PLACE ->
-                _selectedBlockId.value?.let { grid.place(x, y, it) } ?: false
-
-            WorldMode.TAKE_OUT ->
-                grid.erase(x, y)
+            WorldMode.PLACE -> _selectedBlockId.value?.let { grid.place(x, y, it) } ?: false
+            WorldMode.TAKE_OUT -> grid.erase(x, y)
         }
-
-        if (changed) {
-            _cells.value = grid.snapshot()
-        }
+        if (changed) _cells.value = grid.snapshot()
     }
 
-    fun undo() {
-        if (grid.undo()) {
-            _cells.value = grid.snapshot()
-        }
-    }
-
-    fun redo() {
-        if (grid.redo()) {
-            _cells.value = grid.snapshot()
-        }
-    }
-
+    fun undo() { if (grid.undo()) _cells.value = grid.snapshot() }
+    fun redo() { if (grid.redo()) _cells.value = grid.snapshot() }
     // Save the current grid to Room and Firestore
     fun saveWorld(name: String) {
         val repository = worldRepository

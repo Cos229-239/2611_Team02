@@ -20,6 +20,11 @@ const val GRID_TICK_GAP_MS = 35L
 // what talkback reads out for the grid
 const val GRID_LABEL = "Drawing grid, 8 by 8"
 
+// what a touch on the grid does, paint, pick one square for a fill, or nothing
+const val GRID_TOUCH_PAINT = 0
+const val GRID_TOUCH_PICK = 1
+const val GRID_TOUCH_OFF = 2
+
 // fill-in checks per square width along a swipe
 private const val SAMPLES_PER_SQUARE = 3
 
@@ -197,4 +202,46 @@ fun getCrossingColor(pixels: List<Int>, row: Int, col: Int): Int
         }
     }
     return 0
+}
+
+// adds row, col to patch when it holds old and isn't in yet
+private fun addFillSquare(patch: MutableList<Int>, pixels: List<Int>, row: Int, col: Int, old: Int)
+{
+    // off any of the four edges
+    if (row < 0 || col < 0 || row >= GRID_SIZE || col >= GRID_SIZE)
+    {
+        return
+    }
+    val index = row * GRID_SIZE + col
+    if (getPixelAt(pixels, index) == old && !patch.contains(index))
+    {
+        patch.add(index)
+    }
+}
+
+// returns the squares a fill from index would change, nearest first, none when it's already that color
+fun findFillSquares(pixels: List<Int>, index: Int, color: Int): List<Int>
+{
+    val patch = mutableListOf<Int>()
+    val old = getPixelAt(pixels, index)
+    // off the grid or already this color, nothing to fill
+    if (index < 0 || index >= GRID_SQUARE_COUNT || old == color)
+    {
+        return patch
+    }
+    patch.add(index)
+    // patch is also the line still to visit, it grows as the walk goes
+    var next = 0
+    while (next < patch.size)
+    {
+        val row = patch[next] / GRID_SIZE
+        val col = patch[next] % GRID_SIZE
+        // up, down, left, right, a corner touch doesn't count
+        addFillSquare(patch, pixels, row - 1, col, old)
+        addFillSquare(patch, pixels, row + 1, col, old)
+        addFillSquare(patch, pixels, row, col - 1, old)
+        addFillSquare(patch, pixels, row, col + 1, old)
+        next++
+    }
+    return patch
 }

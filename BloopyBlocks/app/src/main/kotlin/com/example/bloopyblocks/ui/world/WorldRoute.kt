@@ -26,18 +26,13 @@ import kotlinx.coroutines.CancellationException
 
 @Composable
 fun WorldRoute(modifier: Modifier = Modifier) {
-
-    val application =
-        LocalContext.current.applicationContext as BloopyBlocksApplication
-
+    val application = LocalContext.current.applicationContext as BloopyBlocksApplication
     val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val worldViewModel: WorldViewModel = viewModel()
+    var savedBlocks by remember { mutableStateOf<List<Block>>(emptyList()) }
 
     var worldRepository by remember {
         mutableStateOf<WorldRepository?>(null)
-    }
-
-    var savedBlocks by remember {
-        mutableStateOf<List<Block>>(emptyList())
     }
 
 // Retrieve repositories from AppContainer
@@ -58,21 +53,15 @@ fun WorldRoute(modifier: Modifier = Modifier) {
 
                     savedBlocks = saved
                         .filter { it.pixels.size == 64 }
-                        .map {
-                            Block(
-                                id = it.id,
-                                name = it.name,
-                                pixels = it.pixels
-                            )
-                        }
+                        .map { Block(id = it.id, name = it.name, pixels = it.pixels) }
                 }
-
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-// Stand-in blocks remain available
+            // if the repository can't be reached, the stand-in blocks stay on screen
         }
     }
+
 
 // Wait until the world repository is available
     val repository = worldRepository
@@ -102,6 +91,7 @@ fun WorldRoute(modifier: Modifier = Modifier) {
         val worldViewModel: WorldViewModel = viewModel(
             factory = factory
         )
+
 
         WorldScreen(
             viewModel = worldViewModel,
