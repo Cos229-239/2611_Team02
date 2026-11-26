@@ -22,6 +22,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -141,21 +142,21 @@ internal fun MainScreen(
         bottomBar = {
             NavigationBar(containerColor = Color.White, tonalElevation = 0.dp) {
                 NavigationBarItem(
-                    false,
+                    selected = false,
 onClick = {onItemClick(World) },
-                    icon ={Box(Modifier.size(22.dp).background(BloopIconGray, RoundedCornerShape(6.dp)))},
-                    label={ Text("Build", fontFamily = BloopBodyFont)}
+                    icon = { Icon(painterResource(R.drawable.ic_build), contentDescription = "Build") },
+                    label = { Text("Build", fontFamily = BloopBodyFont) }
                 )
                 NavigationBarItem(
                     selected = false,
                     onClick = { onItemClick(Draw) },
-                    icon = { Box(Modifier.size(22.dp).background(BloopIconGray, RoundedCornerShape(6.dp))) },
+                    icon = { Icon(painterResource(R.drawable.ic_draw), contentDescription = "Draw") },
                     label = { Text("Draw", fontFamily = BloopBodyFont) }
                 )
                 NavigationBarItem(
                     selected = false,
                     onClick = { onItemClick(Gallery) },
-                    icon = { Box(Modifier.size(22.dp).background(BloopIconGray, RoundedCornerShape(6.dp))) },
+                    icon = { Icon(painterResource(R.drawable.ic_blocks), contentDescription = "My Blocks") },
                     label = { Text("My Blocks", fontFamily = BloopBodyFont) }
                 )
             }
@@ -186,7 +187,12 @@ onClick = {onItemClick(World) },
                 modifier = Modifier.padding(24.dp, 16.dp)
             )
             Text(
-                text = "Welcome back, builder!",
+                // shows how many blocks are saved, or asks to draw the first one
+                text = when (data.size) {
+                    0 -> "Draw your first block!"
+                    1 -> "You have 1 block"
+                    else -> "You have ${data.size} blocks"
+                },
                 fontSize = 14.sp,
                 fontFamily = BloopBodyFont,
                 color = BloopGray,
