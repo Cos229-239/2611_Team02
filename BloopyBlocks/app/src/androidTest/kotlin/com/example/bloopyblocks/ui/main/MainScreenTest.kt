@@ -1,7 +1,9 @@
 package com.example.bloopyblocks.ui.main
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import com.example.bloopyblocks.data.local.BlockEntity
 import org.junit.Before
@@ -22,7 +24,8 @@ class MainScreenTest {
     composeTestRule.onNodeWithText("My World").assertExists()
     composeTestRule.onNodeWithText("Keep Building").assertExists()
     composeTestRule.onNodeWithText("Draw a Block").assertExists()
-    composeTestRule.onNodeWithText("My Blocks").assertExists()
+    // "My Blocks" shows up twice, the big button and the bottom bar
+    composeTestRule.onAllNodesWithText("My Blocks").assertCountEquals(2)
   }
 
   // with no saved blocks, Home asks the kid to draw their first one
